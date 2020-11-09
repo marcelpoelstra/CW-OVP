@@ -1,6 +1,6 @@
 class EncodeWorker
   include Sidekiq::Worker
-  sidekiq_options retry: 3
+  sidekiq_options retry: 3, queue: `hostname`.strip
 
   def perform(encode_id)
     encode = Encode.find(encode_id)

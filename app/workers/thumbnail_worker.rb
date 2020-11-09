@@ -1,6 +1,6 @@
 class ThumbnailWorker
   include Sidekiq::Worker
-  sidekiq_options retry: false # job will be discarded if it fails
+  sidekiq_options retry: 3, queue: `hostname`.strip
 
   def perform(encode_id)
     encode = Encode.find(encode_id)
@@ -33,7 +33,7 @@ class ThumbnailWorker
 
       cdn_bucket = ENV['CDN_BUCKET']
       thumbnail_relative_path = Storage::Url::Relative::Thumbnail.call(encode)
-      thumbnail_local_full_path = Storage::Path::Local::Thumbnail.call(encode)
+      thumbnail_local_fdockerull_path = Storage::Path::Local::Thumbnail.call(encode)
       move_thumbnail_to_cdn_cmd = `sh app/encoding/mv.sh #{cdn_bucket} #{thumbnail_relative_path} #{thumbnail_local_full_path}`
       Sidekiq.logger.debug "move_thumbnail_to_cdn_cmd : #{move_thumbnail_to_cdn_cmd}"
       thumbnail_cdn_url = ""
